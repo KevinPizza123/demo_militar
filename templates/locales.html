@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+    <html>
+    <head>
+        <title>Locales</title>
+    </head>
+    <body>
+        <h1>Locales</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>Código</th>
+                    <th>Nombre</th>
+                    <th>Dirección</th>
+                    <th>Teléfono</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for local in locales %}
+                <tr>
+                    <td>{{ local[0] }}</td>
+                    <td>{{ local[1] }}</td>
+                    <td>{{ local[2] }}</td>
+                    <td>{{ local[3] }}</td>
+                    <td>
+                        <a href="/editar_local/{{ local[0] }}">Editar</a> |
+                        <a href="/eliminar_local/{{ local[0] }}" onclick="return confirm('¿Estás seguro de que quieres eliminar este local?')">Eliminar</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <a href="/agregar_local">Agregar Local</a>
+        <br>
+        <a href="/dashboard">Volver al Dashboard</a>
+    </body>
+    </html>

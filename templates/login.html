@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+    <html>
+    <head>
+        <title>Login</title>
+    </head>
+    <body>
+        <h1>Login</h1>
+        <form method="POST">
+            {{ form.hidden_tag() }}
+            {{ form.correo.label }} {{ form.correo() }}<br>
+            {{ form.contrasena.label }} {{ form.contrasena() }}<br>
+            {{ form.submit() }}
+        </form>
+    </body>
+    </html>

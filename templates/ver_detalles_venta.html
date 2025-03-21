@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+    <html>
+    <head>
+        <title>Detalles de Factura de Venta #{{ cod_factura_venta }}</title>
+    </head>
+    <body>
+        <h1>Detalles de Factura de Venta #{{ cod_factura_venta }}</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>Producto</th>
+                    <th>Precio de Venta</th>
+                    <th>Cantidad</th>
+                    <th>Subtotal</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for detalle in detalles %}
+                <tr>
+                    <td>{{ detalle[0] }}</td>
+                    <td>{{ detalle[1] }}</td>
+                    <td>{{ detalle[2] }}</td>
+                    <td>{{ detalle[1] * detalle[2] }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <br>
+        <div>
+            <a href="/reporte/FacturaDeVenta/pdf/{{ cod_factura_venta }}">Descargar PDF</a>
+        </div>
+        <br>
+        <a href="/facturas_venta">Volver a la lista de facturas de venta</a>
+    </body>
+    </html>

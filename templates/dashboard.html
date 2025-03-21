@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+    <html>
+    <head>
+        <title>Dashboard</title>
+    </head>
+    <body>
+        <h1>Bienvenido, {{ current_user.nombre }} {{ current_user.apellido }}</h1>
+        <p>Rol: {{ current_user.rol }}</p>
+
+        {% if current_user.rol == 'vendedor' %}
+            <p>Local: {{ current_user.local_id }}</p>
+        {% endif %}
+
+        <h2>Funcionalidades</h2>
+
+        {% if current_user.rol == 'admin' %}
+            <h3>Usuarios</h3>
+            <ul>
+                <li><a href="{{ url_for('registro_vendedor') }}">Registrar Vendedor</a></li>
+                <li><a href="{{ url_for('locales') }}">Gestionar Locales</a></li>
+                <li><a href="{{ url_for('usuarios') }}">Gestionar Usuarios</a></li>
+            </ul>
+        {% endif %}
+
+        <h3>Productos</h3>
+        <ul>
+            <li><a href="{{ url_for('productos') }}">Gestionar Productos</a></li>
+        </ul>
+
+        <h3>Clientes</h3>
+        <ul>
+            <li><a href="{{ url_for('clientes') }}">Gestionar Clientes</a></li>
+        </ul>
+
+        <h3>Proveedores</h3>
+        <ul>
+            <li><a href="{{ url_for('proveedores') }}">Gestionar Proveedores</a></li>
+        </ul>
+
+        <h3>Facturas</h3>
+        <ul>
+            <li><a href="{{ url_for('facturas_compra') }}">Facturas de Compra</a></li>
+            <li><a href="{{ url_for('facturas_venta') }}">Facturas de Venta</a></li>
+        </ul>
+
+        <a href="{{ url_for('logout') }}">Cerrar Sesión</a>
+    </body>
+    </html>

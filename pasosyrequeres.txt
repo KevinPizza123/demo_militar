@@ -1,0 +1,44 @@
+requisitos : 
+Tablas
+Cod_Prov
+Proveedor, empresa
+Cod_Producto
+Productos
+Cod_Clientes
+Clientes
+Precio_Compra
+Factura de compra
+PVP_Unit
+PVP_Mayor
+Factura de Venta
+Locales: Matriz, Recoleta, ESFORSE, COCA
+Responsable Aministrador(a)
+Inventarios, facturacion, etc
+Productos, descripcion y caracteristicas, images de referencia
+
+CREAR PROYECTO 
+CREAR ENTORNO
+python -m venv venv
+ACTIVAR ENTORNO 
+venv\Scripts\activate
+INSTALAR DEPENDENCIAS A USAR EN EL PROYETO
+pip install Flask psycopg2-binary python-dotenv
+Jinja2 para datos dinamicos desde el server 
+static/images ( carpeta para imagenes )
+Proveedores: Agregar funcionalidades de edición y eliminación.
+Clientes: Crear rutas y plantillas para gestionar clientes.
+Productos: Implementar la lógica para cargar y mostrar imágenes.
+Facturas de Compra/Venta: Crear rutas y plantillas para gestionar facturas.
+Locales: Agregar funcionalidades para gestionar locales.
+Inventario: Implementar la lógica para gestionar el inventario.
+Seguridad: Agregar autenticación y autorización.
+
+nombre 
+descripcion
+imagen
+pvp_unit
+pvp_mayor
+cantidad
+
+edit trae
+pvpunitario trae el pvpmayorista , el pvpmayorista trae la cantidad y la cantidad trae el pvp unitario 

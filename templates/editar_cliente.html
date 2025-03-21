@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+    <html>
+    <head>
+        <title>Editar Cliente</title>
+    </head>
+    <body>
+        <h1>Editar Cliente</h1>
+        <form method="POST">
+            <label>Nombre:</label><br>
+            <input type="text" name="nombre" value="{{ cliente[1] }}" required><br><br>
+
+            <label>Apellido:</label><br>
+            <input type="text" name="apellido" value="{{ cliente[2] }}" required><br><br>
+
+            <label>Teléfono:</label><br>
+            <input type="text" name="telefono" value="{{ cliente[3] }}"><br><br>
+
+            <label>Dirección:</label><br>
+            <input type="text" name="direccion" value="{{ cliente[4] }}"><br><br>
+
+            <input type="submit" value="Guardar Cambios">
+        </form>
+        <br>
+        <a href="/clientes">Volver a la lista de clientes</a>
+    </body>
+    </html>

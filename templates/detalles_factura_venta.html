@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+    <html>
+    <head>
+        <title>Detalles de Factura de Venta</title>
+    </head>
+    <body>
+        <h1>Detalles de Factura de Venta #{{ cod_factura_venta }}</h1>
+        <form method="POST">
+            <label>Producto:</label><br>
+            <select name="cod_producto">
+                {% for producto in productos %}
+                <option value="{{ producto[0] }}">{{ producto[1] }}</option>
+                {% endfor %}
+            </select><br><br>
+            <label>Precio Unitario:</label><br>
+            <input type="number" name="pvp_unit" step="0.01" required><br><br>
+            <label>Precio Mayorista:</label><br>
+            <input type="number" name="pvp_mayor" step="0.01" required><br><br>
+            <label>Cantidad:</label><br>
+            <input type="number" name="cantidad" required><br><br>
+            <input type="submit" value="Agregar Detalle">
+        </form>
+        <br>
+        <a href="/facturas_venta">Volver a la lista de facturas de venta</a>
+    </body>
+    </html>

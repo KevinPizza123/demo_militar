@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Productos</title>
+</head>
+<body>
+    <h1>Productos</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Código</th>
+                <th>Nombre</th>
+                <th>Descripción</th>
+                <th>Imagen</th>
+                <th>PVP Unitario</th>
+                <th>PVP Mayorista</th>
+                <th>Cantidad</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for producto in productos %}
+            <tr>
+                <td>{{ producto[0] }}</td>
+                <td>{{ producto[1] }}</td>
+                <td>{{ producto[2] }}</td>
+                <td>
+                    {% if producto[3] %}
+                    <img src="{{ url_for('static', filename='images/' + producto[3]) }}" alt="Imagen del producto" style="max-width: 100px;">
+                    {% else %}
+                    Sin imagen
+                    {% endif %}
+                </td>
+                <td>{{ producto[4] }}</td>
+                <td>{{ producto[5] }}</td>
+                <td>
+                    {{ producto[6] }}
+                    {% if producto[6] is not none and producto[6] < 1 %}
+                        <span style="color: red;"> (¡Pedir más!)</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <a href="/editar_producto/{{ producto[0] }}">Editar</a> |
+                    <a href="/eliminar_producto/{{ producto[0] }}" onclick="return confirm('¿Estás seguro de que quieres eliminar este producto?')">Eliminar</a>
+                </td>
+            
+            </tr>
+            {% endfor %}
+            <tr>
+            <td>
+                <a href="/reporte/Productos/excel">Descargar Excel</a> |
+                <a href="/reporte/Productos/pdf">Descargar PDF</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <a href="/agregar_producto">Agregar Producto</a>
+</body>
+</html>

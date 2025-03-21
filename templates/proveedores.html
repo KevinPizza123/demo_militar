@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+    <html>
+    <head>
+        <title>Proveedores</title>
+    </head>
+    <body>
+        <h1>Proveedores</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>Código</th>
+                    <th>Proveedor</th>
+                    <th>Empresa</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for proveedor in proveedores %}
+                <tr>
+                    <td>{{ proveedor[0] }}</td>
+                    <td>{{ proveedor[1] }}</td>
+                    <td>{{ proveedor[2] }}</td>
+                    <td>
+                        <a href="/editar_proveedor/{{ proveedor[0] }}">Editar</a> |
+                        <a href="/eliminar_proveedor/{{ proveedor[0] }}">Eliminar</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+            <td>
+                <a href="/reporte/Proveedores/excel">Descargar Excel</a> |
+                <a href="/reporte/Proveedores/pdf">Descargar PDF</a>
+            </td>
+        </table>
+        <a href="/agregar_proveedor">Agregar Proveedor</a>
+    </body>
+    </html>

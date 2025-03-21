@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+    <html>
+    <head>
+        <title>Editar Producto</title>
+    </head>
+    <body>
+        <h1>Editar Producto</h1>
+        <form method="POST" enctype="multipart/form-data">
+            <label>Nombre:</label><br>
+            <input type="text" name="nombre" value="{{ producto[1] }}" required><br><br>
+
+            <label>Descripción:</label><br>
+            <textarea name="descripcion">{{ producto[2] }}</textarea><br><br>
+
+            <label>Imagen:</label><br>
+            <img src="{{ url_for('static', filename='images/' + producto[3]) }}" alt="Imagen del producto" style="max-width: 100px;"><br>
+            <input type="file" name="imagen"><br><br>
+            <input type="hidden" name="imagen_actual" value="{{ producto[3] }}">
+
+            <label>PVP Unitario:</label><br>
+            <input type="number" name="pvp_unit" value="{{ producto[4] }}" step="0.01" required><br><br>
+
+            <label>PVP Mayorista:</label><br>
+            <input type="number" name="pvp_mayor" value="{{ producto[5] }}" step="0.01" required><br><br>
+
+            <label>Cantidad:</label><br>
+            <input type="number" name="cantidad" value="{{ producto[6] }}" required><br><br>
+
+            <input type="submit" value="Guardar Cambios">
+        </form>
+        <br>
+        <a href="/productos">Volver a la lista de productos</a>
+    </body>
+    </html>

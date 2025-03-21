@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+    <html>
+    <head>
+        <title>Editar Factura de Compra</title>
+    </head>
+    <body>
+        <h1>Editar Factura de Compra</h1>
+        <form method="POST">
+            <label>Proveedor:</label><br>
+            <select name="cod_prov">
+                {% for proveedor in proveedores %}
+                <option value="{{ proveedor[0] }}" {% if proveedor[0] == factura[1] %}selected{% endif %}>{{ proveedor[1] }}</option>
+                {% endfor %}
+            </select><br><br>
+            <label>Fecha:</label><br>
+            <input type="date" name="fecha" value="{{ factura[2] }}" required><br><br>
+            <label>Productos:</label><br>
+            {% for producto in productos %}
+            <input type="checkbox" name="cod_producto" value="{{ producto[0] }}"> {{ producto[1] }}<br>
+            <label>Precio de Compra:</label>
+            <input type="number" name="precio_compra" step="0.01" required><br>
+            <label>Cantidad:</label>
+            <input type="number" name="cantidad" required><br><br>
+            {% endfor %}
+            <input type="submit" value="Guardar Cambios">
+        </form>
+        <br>
+        <table>
+            <thead>
+                <tr>
+                    <th>Producto</th>
+                    <th>Precio de Compra</th>
+                    <th>Cantidad</th>
+                    <th>Subtotal</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for detalle in detalles %}
+                <tr>
+                    <td>{{ detalle[1] }}</td>
+                    <td>{{ detalle[2] }}</td>
+                    <td>{{ detalle[3] }}</td>
+                    <td>{{ detalle[2] * detalle[3] }}</td>
+                
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <br>
+        <td>
+            <a href="/reporte/DetallesFacturaCompra/excel">Descargar Excel</a> |
+            <a href="/reporte/DetallesFacturaCompra/pdf">Descargar PDF</a>
+        </td>
+        <br>
+        <a href="/facturas_compra">Volver a la lista de facturas de compra</a>
+    </body>
+    </html>

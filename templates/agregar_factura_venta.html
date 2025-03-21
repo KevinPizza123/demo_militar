@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+    <html>
+    <head>
+        <title>Agregar Factura de Venta</title>
+    </head>
+    <body>
+        <h1>Agregar Factura de Venta</h1>
+        <form method="POST">
+            <label>Cliente:</label><br>
+            <select name="cod_clientes">
+                {% for cliente in clientes %}
+                <option value="{{ cliente[0] }}">{{ cliente[1] }} {{ cliente[2] }}</option>
+                {% endfor %}
+            </select><br><br>
+            <label>Fecha:</label><br>
+            <input type="date" name="fecha" required><br><br>
+            <label>Producto:</label><br>
+            <select name="cod_producto">
+                {% for producto in productos %}
+                <option value="{{ producto[0] }}">{{ producto[1] }}</option>
+                {% endfor %}
+            </select><br><br>
+            <label>Precio de Venta:</label>
+            <input type="number" name="precio_venta" step="0.01" required><br>
+            <label>Cantidad:</label>
+            <input type="number" name="cantidad" required><br><br>
+            <input type="submit" value="Agregar Factura">
+        </form>
+        <br>
+        <a href="/facturas_venta">Volver a la lista de facturas de venta</a>
+    </body>
+    </html>

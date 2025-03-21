@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+    <html>
+    <head>
+        <title>Agregar Factura de Compra</title>
+    </head>
+    <body>
+        <h1>Agregar Factura de Compra</h1>
+        <form method="POST">
+            <label>Proveedor:</label><br>
+            <select name="cod_prov">
+                {% for proveedor in proveedores %}
+                <option value="{{ proveedor[0] }}">{{ proveedor[1] }}</option>
+                {% endfor %}
+            </select><br><br>
+            <label>Fecha:</label><br>
+            <input type="date" name="fecha" required><br><br>
+            <label>Producto:</label><br>
+            <input type="text" id="producto_busqueda" placeholder="Buscar producto...">
+            <select name="cod_producto" id="producto_seleccionado">
+                {% for producto in productos %}
+                <option value="{{ producto[0] }}">{{ producto[1] }}</option>
+                {% endfor %}
+            </select><br><br>
+            <label>Precio de Compra:</label>
+            <input type="number" name="precio_compra" step="0.01" required><br>
+            <label>Cantidad:</label>
+            <input type="number" name="cantidad" required><br><br>
+            <input type="submit" value="Agregar Factura">
+        </form>
+        <br>
+        <a href="/facturas_compra">Volver a la lista de facturas de compra</a>
+        <script>
+            const busquedaInput = document.getElementById('producto_busqueda');
+            const seleccionProducto = document.getElementById('producto_seleccionado');
+
+            busquedaInput.addEventListener('input', function() {
+                const filtro = busquedaInput.value.toLowerCase();
+                for (let i = 0; i < seleccionProducto.options.length; i++) {
+                    const opcion = seleccionProducto.options[i];
+                    if (opcion.text.toLowerCase().includes(filtro)) {
+                        opcion.style.display = 'block';
+                    } else {
+                        opcion.style.display = 'none';
+                    }
+                }
+            });
+        </script>
+    </body>
+    </html>

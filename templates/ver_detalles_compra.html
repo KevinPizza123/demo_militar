@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+    <html>
+    <head>
+        <title>Detalles de Factura de Compra #{{ cod_factura_compra }}</title>
+    </head>
+    <body>
+        <h1>Detalles de Factura de Compra #{{ cod_factura_compra }}</h1>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Producto</th>
+                    <th>Precio de Compra</th>
+                    <th>Cantidad</th>
+                    <th>Subtotal</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for detalle in detalles %}
+                <tr>
+                    <td>{{ detalle[1] }}</td>
+                    <td>{{ detalle[2] }}</td>
+                    <td>{{ detalle[3] }}</td>
+                    <td>{{ detalle[2] * detalle[3] }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <br>
+
+        <div>
+            <a href="/reporte/FacturaDeCompra/pdf/{{ cod_factura_compra }}">Descargar PDF</a>
+        </div>
+
+        <br>
+
+        <a href="/facturas_compra">Volver a la lista de facturas de compra</a>
+    </body>
+    </html>

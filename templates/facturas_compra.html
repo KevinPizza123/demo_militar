@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+    <html>
+    <head>
+        <title>Facturas de Compra</title>
+    </head>
+    <body>
+        <h1>Facturas de Compra</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>Código</th>
+                    <th>Proveedor</th>
+                    <th>Fecha</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for factura in facturas %}
+                <tr>
+                    <td>{{ factura[0] }}</td>
+                    <td>{{ factura[1] }}</td>
+                    <td>{{ factura[2] }}</td>
+                    <td>{{ factura[3] }}</td>
+                    <td>
+                        <a href="/editar_factura_compra/{{ factura[0] }}">Editar</a> |
+                        <a href="/eliminar_factura_compra/{{ factura[0] }}" onclick="return confirm('¿Estás seguro de que quieres eliminar esta factura?')">Eliminar</a> |
+                        <a href="/ver_detalles_compra/{{ factura[0] }}">Ver Detalles</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <a href="/agregar_factura_compra">Agregar Factura de Compra</a>
+    </body>
+    </html>
