@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+    <html>
+    <head>
+        <title>Agregar Inventario</title>
+    </head>
+    <body>
+        <h1>Agregar Inventario</h1>
+        <form method="POST">
+            <label for="local_id">Local:</label><br>
+            <select id="local_id" name="local_id">
+                {% for local in locales %}
+                    <option value="{{ local[0] }}">{{ local[1] }}</option>
+                {% endfor %}
+            </select><br><br>
+            <label for="producto_id">Producto:</label><br>
+            <select id="producto_id" name="producto_id">
+                {% for producto in productos %}
+                    <option value="{{ producto[0] }}">{{ producto[1] }}</option>
+                {% endfor %}
+            </select><br><br>
+            <label for="cantidad">Cantidad:</label><br>
+            <input type="number" id="cantidad" name="cantidad"><br><br>
+            <input type="submit" value="Agregar">
+        </form>
+        <br>
+        <a href="/inventario">Volver a Inventario</a>
+    </body>
+    </html>

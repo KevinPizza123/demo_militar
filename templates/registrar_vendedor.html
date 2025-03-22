@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+    <html>
+    <head>
+        <title>Registrar Vendedor</title>
+    </head>
+    <body>
+        <h1>Registrar Vendedor</h1>
+        <form method="POST">
+            <label for="nombre">Nombre:</label><br>
+            <input type="text" id="nombre" name="nombre"><br><br>
+            <label for="apellido">Apellido:</label><br>
+            <input type="text" id="apellido" name="apellido"><br><br>
+            <label for="correo">Correo:</label><br>
+            <input type="email" id="correo" name="correo"><br><br>
+            <label for="contrasena">Contraseña:</label><br>
+            <input type="password" id="contrasena" name="contrasena"><br><br>
+            <label for="local_id">Local:</label><br>
+            <select id="local_id" name="local_id">
+                {% for local in locales %}
+                    <option value="{{ local[0] }}">{{ local[1] }}</option>
+                {% endfor %}
+            </select><br><br>
+            <input type="submit" value="Registrar">
+        </form>
+        <br>
+        <a href="/dashboard">Volver al Dashboard</a>
+    </body>
+    </html>

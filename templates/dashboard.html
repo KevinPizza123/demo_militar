@@ -16,7 +16,7 @@
         {% if current_user.rol == 'admin' %}
             <h3>Usuarios</h3>
             <ul>
-                <li><a href="{{ url_for('registro_vendedor') }}">Registrar Vendedor</a></li>
+                <li><a href="{{ url_for('registrar_vendedor') }}">Registrar Vendedor</a></li>
                 <li><a href="{{ url_for('locales') }}">Gestionar Locales</a></li>
                 <li><a href="{{ url_for('usuarios') }}">Gestionar Usuarios</a></li>
             </ul>
@@ -41,6 +41,11 @@
         <ul>
             <li><a href="{{ url_for('facturas_compra') }}">Facturas de Compra</a></li>
             <li><a href="{{ url_for('facturas_venta') }}">Facturas de Venta</a></li>
+        </ul>
+
+        <h3>Inventario</h3>
+        <ul>
+            <li><a href="{{ url_for('inventario') }}">Gestionar Inventario</a></li>
         </ul>
 
         <a href="{{ url_for('logout') }}">Cerrar Sesión</a>

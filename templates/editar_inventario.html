@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+    <html>
+    <head>
+        <title>Editar Inventario</title>
+    </head>
+    <body>
+        <h1>Editar Inventario</h1>
+        <form method="POST">
+            <label for="local_id">Local:</label><br>
+            <select id="local_id" name="local_id">
+                {% for local in locales %}
+                    <option value="{{ local[0] }}" {% if local[0] == inventario[1] %}selected{% endif %}>{{ local[1] }}</option>
+                {% endfor %}
+            </select><br><br>
+            <label for="producto_id">Producto:</label><br>
+            <select id="producto_id" name="producto_id">
+                {% for producto in productos %}
+                    <option value="{{ producto[0] }}" {% if producto[0] == inventario[2] %}selected{% endif %}>{{ producto[1] }}</option>
+                {% endfor %}
+            </select><br><br>
+            <label for="cantidad">Cantidad:</label><br>
+            <input type="number" id="cantidad" name="cantidad" value="{{ inventario[3] }}"><br><br>
+            <input type="submit" value="Guardar Cambios">
+        </form>
+        <br>
+        <a href="/inventario">Volver a Inventario</a>
+    </body>

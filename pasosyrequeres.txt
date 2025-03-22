@@ -42,3 +42,11 @@ cantidad
 
 edit trae
 pvpunitario trae el pvpmayorista , el pvpmayorista trae la cantidad y la cantidad trae el pvp unitario 
+
+
+usuario admin : 
+'Miguel',
+        'Coyago',
+        'miguel25@gmail.com',
+' militar25'
+$2b$12$Ax1ZCTTIgLfhdllgACubOuzYW3tWu9VttXcZ5BJ5CZoHwKy7loApS

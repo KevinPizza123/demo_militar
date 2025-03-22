@@ -140,14 +140,56 @@ class LoginForm(FlaskForm):
         contrasena = PasswordField('Contraseña', validators=[DataRequired()])
         submit = SubmitField('Iniciar Sesión')
 
-    # Formulario de Registro de Vendedor
-class RegistroVendedorForm(FlaskForm):
-        nombre = StringField('Nombre', validators=[DataRequired()])
-        apellido = StringField('Apellido', validators=[DataRequired()])
-        correo = StringField('Correo', validators=[DataRequired(), Email()])
-        contrasena = PasswordField('Contraseña', validators=[DataRequired()])
-        local_id = SelectField('Local', coerce=int, validators=[DataRequired()])
-        submit = SubmitField('Registrar Vendedor')
+@app.route('/registrar_vendedor', methods=['GET', 'POST'])
+def registrar_vendedor():
+        if current_user.rol != 'admin':
+            flash('No tienes permiso para acceder a esta página', 'danger')
+            return redirect(url_for('dashboard'))
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute('SELECT local_id, Nombre FROM Locales;')
+        locales = cur.fetchall()
+        cur.close()
+        if request.method == 'POST':
+            nombre = request.form['nombre']
+            apellido = request.form['apellido']
+            correo = request.form['correo']
+            contrasena = request.form['contrasena']
+            local_id = request.form['local_id']
+            error = None
+
+            if not nombre:
+                error = 'Nombre es requerido.'
+            elif not apellido:
+                error = 'Apellido es requerido.'
+            elif not correo:
+                error = 'Correo es requerido.'
+            elif not contrasena:
+                error = 'Contraseña es requerida.'
+            elif not local_id:
+                error = 'Local es requerido.'
+
+            if error is None:
+                try:
+                    cur = conn.cursor()
+                    # Hashear la contraseña usando bcrypt
+                    contrasena_bytes = contrasena.encode('utf-8')
+                    hash_bytes = bcrypt.hashpw(contrasena_bytes, bcrypt.gensalt())
+                    hash_str = hash_bytes.decode('utf-8')
+
+                    cur.execute(
+                        "INSERT INTO Usuarios (Nombre, Apellido, Correo, Contrasena, Rol, local_id) VALUES (%s, %s, %s, %s, %s, %s);",
+                        (nombre, apellido, correo, hash_str, 'vendedor', local_id),
+                    )
+                    conn.commit()
+                except psycopg2.IntegrityError:
+                    error = f"El usuario {correo} ya está registrado."
+                else:
+                    return redirect(url_for("login"))
+                finally:
+                    cur.close()
+            flash(error)
+        return render_template('registrar_vendedor.html', locales=locales)
 
 @app.route('/')
 def index():
@@ -229,20 +271,7 @@ def dashboard():
 
 
     # ... (rutas y funciones para cada tabla) ...
-#locales
-@app.route('/locales')
-@login_required
-def locales():
-        if current_user.rol != 'admin':
-            flash('No tienes permiso para acceder a esta página', 'danger')
-            return redirect(url_for('dashboard'))
-        conn = get_db_connection()
-        cur = conn.cursor()
-        cur.execute('SELECT * FROM Locales;')
-        locales = cur.fetchall()
-        cur.close()
-        conn.close()
-        return render_template('locales.html', locales=locales)
+
     
 #usuarios
 @app.route('/usuarios')
@@ -253,12 +282,15 @@ def usuarios():
             return redirect(url_for('dashboard'))
         conn = get_db_connection()
         cur = conn.cursor()
-        cur.execute('SELECT * FROM Usuarios;')
+        cur.execute('''
+            SELECT Usuarios.Cod_Usuario, Usuarios.Nombre, Usuarios.Apellido, Usuarios.Correo, Usuarios.Rol, Locales.Nombre
+            FROM Usuarios
+            LEFT JOIN Locales ON Usuarios.local_id = Locales.local_id;
+        ''')
         usuarios = cur.fetchall()
         cur.close()
         conn.close()
         return render_template('usuarios.html', usuarios=usuarios)
-    
 #proveedores
 @app.route('/proveedores')
 def proveedores():
@@ -832,6 +864,181 @@ def reporte_factura_venta_pdf(cod_factura_venta):
         output.seek(0)
         return send_file(output, download_name=f'Factura_Venta_{cod_factura_venta}.pdf', as_attachment=True)
     
+#locales
+
+@app.route('/locales')
+@login_required
+def locales():
+        if current_user.rol != 'admin':
+            flash('No tienes permiso para acceder a esta página', 'danger')
+            return redirect(url_for('dashboard'))
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute('SELECT * FROM Locales;')
+        locales = cur.fetchall()
+        cur.close()
+        conn.close()
+        return render_template('locales.html', locales=locales)
+
+# Ruta para agregar un local
+@app.route('/agregar_local', methods=['GET', 'POST'])
+@login_required
+def agregar_local():
+        if current_user.rol != 'admin':
+            flash('No tienes permiso para acceder a esta página', 'danger')
+            return redirect(url_for('dashboard'))
+        if request.method == 'POST':
+            nombre = request.form['nombre']
+            direccion = request.form['direccion']
+            telefono = request.form['telefono']
+            conn = get_db_connection()
+            cur = conn.cursor()
+            cur.execute('INSERT INTO Locales (Nombre, Direccion, Telefono) VALUES (%s, %s, %s);', (nombre, direccion, telefono))
+            conn.commit()
+            cur.close()
+            conn.close()
+            flash('Local agregado exitosamente', 'success')
+            return redirect(url_for('locales'))
+        return render_template('agregar_local.html')
+
+    # Ruta para editar un local
+@app.route('/editar_local/<int:local_id>', methods=['GET', 'POST'])
+@login_required
+def editar_local(local_id):
+        if current_user.rol != 'admin':
+            flash('No tienes permiso para acceder a esta página', 'danger')
+            return redirect(url_for('dashboard'))
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute('SELECT * FROM Locales WHERE local_id = %s;', (local_id,))
+        local = cur.fetchone()
+        cur.close()
+        conn.close()
+        if request.method == 'POST':
+            nombre = request.form['nombre']
+            direccion = request.form['direccion']
+            telefono = request.form['telefono']
+            conn = get_db_connection()
+            cur = conn.cursor()
+            cur.execute('UPDATE Locales SET Nombre = %s, Direccion = %s, Telefono = %s WHERE local_id = %s;', (nombre, direccion, telefono, local_id))
+            conn.commit()
+            cur.close()
+            conn.close()
+            flash('Local editado exitosamente', 'success')
+            return redirect(url_for('locales'))
+        return render_template('editar_local.html', local=local)
+
+    # Ruta para eliminar un local
+@app.route('/eliminar_local/<int:local_id>')
+@login_required
+def eliminar_local(local_id):
+        if current_user.rol != 'admin':
+            flash('No tienes permiso para acceder a esta página', 'danger')
+            return redirect(url_for('dashboard'))
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute('DELETE FROM Locales WHERE local_id = %s;', (local_id,))
+        conn.commit()
+        cur.close()
+        conn.close()
+        flash('Local eliminado exitosamente', 'success')
+        return redirect(url_for('locales'))
+    
+#Inventario
+@app.route('/inventario')
+@login_required
+def inventario():
+        if current_user.rol != 'admin':
+            flash('No tienes permiso para acceder a esta página', 'danger')
+            return redirect(url_for('dashboard'))
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute('''
+            SELECT Inventario.cod_inventario, Locales.Nombre, Productos.Nombre, Inventario.cantidad
+            FROM Inventario
+            JOIN Locales ON Inventario.local_Id = Locales.local_id
+            JOIN Productos ON Inventario.cod_producto = Productos.cod_producto;
+        ''')
+        inventario = cur.fetchall()
+        cur.close()
+        conn.close()
+        return render_template('inventario.html', inventario=inventario)
+
+@app.route('/agregar_inventario', methods=['GET', 'POST'])
+@login_required
+def agregar_inventario():
+        if current_user.rol != 'admin':
+            flash('No tienes permiso para acceder a esta página', 'danger')
+            return redirect(url_for('dashboard'))
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute('SELECT local_id, Nombre FROM Locales;')
+        locales = cur.fetchall()
+        cur.execute('SELECT cod_producto, Nombre FROM Productos;')
+        productos = cur.fetchall()
+        cur.close()
+        if request.method == 'POST':
+            local_id = request.form['local_id']
+            producto_id = request.form['producto_id']
+            cantidad = request.form['cantidad']
+            conn = get_db_connection()
+            cur = conn.cursor()
+            cur.execute('INSERT INTO Inventario (local_Id, cod_producto, cantidad) VALUES (%s, %s, %s);', (local_id, producto_id, cantidad))
+            conn.commit()
+            cur.close()
+            conn.close()
+            flash('Inventario agregado exitosamente', 'success')
+            return redirect(url_for('inventario'))
+        return render_template('agregar_inventario.html', locales=locales, productos=productos)
+
+@app.route('/editar_inventario/<int:inventario_id>', methods=['GET', 'POST'])
+@login_required
+def editar_inventario(inventario_id):
+        if current_user.rol != 'admin':
+            flash('No tienes permiso para acceder a esta página', 'danger')
+            return redirect(url_for('dashboard'))
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute('SELECT * FROM Inventario WHERE cod_inventario = %s;', (inventario_id,))
+        inventario = cur.fetchone()
+        cur.execute('SELECT local_id, Nombre FROM Locales;')
+        locales = cur.fetchall()
+        cur.execute('SELECT cod_producto, Nombre FROM Productos;')
+        productos = cur.fetchall()
+        cur.close()
+        conn.close()
+        if request.method == 'POST':
+            local_id = request.form['local_id']
+            producto_id = request.form['producto_id']
+            cantidad = request.form['cantidad']
+            conn = get_db_connection()
+            cur = conn.cursor()
+            cur.execute('UPDATE Inventario SET local_Id = %s, cod_producto = %s, cantidad = %s WHERE cod_inventario = %s;', (local_id, producto_id, cantidad, inventario_id))
+            conn.commit()
+            cur.close()
+            conn.close()
+            flash('Inventario editado exitosamente', 'success')
+            return redirect(url_for('inventario'))
+        return render_template('editar_inventario.html', inventario=inventario, locales=locales, productos=productos)
+
+@app.route('/eliminar_inventario/<int:inventario_id>')
+@login_required
+def eliminar_inventario(inventario_id):
+        if current_user.rol != 'admin':
+            flash('No tienes permiso para acceder a esta página', 'danger')
+            return redirect(url_for('dashboard'))
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute('DELETE FROM Inventario WHERE cod_inventario = %s;', (inventario_id,))
+        conn.commit()
+        cur.close()
+        conn.close()
+        flash('Inventario eliminado exitosamente', 'success')
+        return redirect(url_for('inventario'))
+
+    
+
+
     
 if __name__ == '__main__':
         app.run(debug=True)
