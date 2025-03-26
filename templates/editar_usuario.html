@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+    <html>
+    <head>
+        <title>Editar Usuario</title>
+    </head>
+    <body>
+        <h1>Editar Usuario</h1>
+
+            <ul class=flashes>
+            {% for message in messages %}
+                <li>{{ message }}</li>
+            {% endfor %}
+            </ul>
+
+        <form method="POST">
+            <label for="nombre">Nombre:</label><br>
+            <input type="text" id="nombre" name="nombre" value="{{ usuario[1] }}"><br><br>
+            <label for="apellido">Apellido:</label><br>
+            <input type="text" id="apellido" name="apellido" value="{{ usuario[2] }}"><br><br>
+            <label for="correo">Correo:</label><br>
+            <input type="email" id="correo" name="correo" value="{{ usuario[3] }}"><br><br>
+            <label for="rol">Rol:</label><br>
+            <select id="rol" name="rol">
+                <option value="admin" {% if usuario[4] == 'admin' %}selected{% endif %}>Admin</option>
+                <option value="vendedor" {% if usuario[4] == 'vendedor' %}selected{% endif %}>Vendedor</option>
+            </select><br><br>
+            <label for="local_id">Local:</label><br>
+            <select id="local_id" name="local_id">
+                {% for local in locales %}
+                    <option value="{{ local[0] }}" {% if local[0] == usuario[5] %}selected{% endif %}>{{ local[1] }}</option>
+                {% endfor %}
+            </select><br><br>
+            <label for="contrasena">Nueva Contraseña (opcional):</label><br>
+            <input type="password" id="contrasena" name="contrasena"><br><br>
+            <input type="submit" value="Guardar Cambios">
+        </form>
+        <br>
+        <a href="/usuarios">Volver a Usuarios</a>
+    </body>
+    </html>

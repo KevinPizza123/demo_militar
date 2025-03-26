@@ -291,6 +291,67 @@ def usuarios():
         cur.close()
         conn.close()
         return render_template('usuarios.html', usuarios=usuarios)
+    
+@app.route('/editar_usuario/<int:usuario_id>', methods=['GET', 'POST'])
+@login_required
+def editar_usuario(usuario_id):
+        if current_user.rol != 'admin':
+            flash('No tienes permiso para acceder a esta página', 'danger')
+            return redirect(url_for('dashboard'))
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute('SELECT * FROM Usuarios WHERE Cod_Usuario = %s;', (usuario_id,))
+        usuario = cur.fetchone()
+        cur.execute('SELECT local_id, Nombre FROM Locales;')
+        locales = cur.fetchall()
+        cur.close()
+        conn.close()
+        if request.method == 'POST':
+            nombre = request.form['nombre']
+            apellido = request.form['apellido']
+            correo = request.form['correo']
+            rol = request.form['rol']
+            local_id = request.form['local_id']
+            contrasena = request.form.get('contrasena') # Obtener la contraseña si se proporciona
+
+            conn = get_db_connection()
+            cur = conn.cursor()
+            try:
+                if contrasena: # Hashear y actualizar la contraseña si se proporciona
+                    contrasena_bytes = contrasena.encode('utf-8')
+                    hash_bytes = bcrypt.hashpw(contrasena_bytes, bcrypt.gensalt())
+                    hash_str = hash_bytes.decode('utf-8')
+                    cur.execute('UPDATE Usuarios SET Nombre = %s, Apellido = %s, Correo = %s, Rol = %s, local_id = %s, Contrasena = %s WHERE Cod_Usuario = %s;', (nombre, apellido, correo, rol, local_id, hash_str, usuario_id))
+                else: # Actualizar solo los otros campos si no se proporciona contraseña
+                    cur.execute('UPDATE Usuarios SET Nombre = %s, Apellido = %s, Correo = %s, Rol = %s, local_id = %s WHERE Cod_Usuario = %s;', (nombre, apellido, correo, rol, local_id, usuario_id))
+                conn.commit()
+                flash('Usuario editado exitosamente', 'success')
+                return redirect(url_for('usuarios'))
+            except psycopg2.Error as e:
+                flash(f'Error al editar usuario: {e}', 'danger')
+            finally:
+                cur.close()
+            conn.close()
+        return render_template('editar_usuario.html', usuario=usuario, locales=locales)
+
+@app.route('/eliminar_usuario/<int:usuario_id>')
+@login_required
+def eliminar_usuario(usuario_id):
+        if current_user.rol != 'admin':
+            flash('No tienes permiso para acceder a esta página', 'danger')
+            return redirect(url_for('dashboard'))
+        conn = get_db_connection()
+        cur = conn.cursor()
+        try:
+            cur.execute('DELETE FROM Usuarios WHERE Cod_Usuario = %s;', (usuario_id,))
+            conn.commit()
+            flash('Usuario eliminado exitosamente', 'success')
+        except psycopg2.Error as e:
+            flash(f'Error al eliminar usuario: {e}', 'danger')
+        finally:
+            cur.close()
+        conn.close()
+        return redirect(url_for('usuarios'))
 #proveedores
 @app.route('/proveedores')
 def proveedores():
