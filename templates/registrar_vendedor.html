@@ -5,6 +5,12 @@
     </head>
     <body>
         <h1>Registrar Vendedor</h1>
+        
+            <ul class=flashes>
+            {% for message in messages %}
+                <li>{{ message }}</li>
+            {% endfor %}
+            </ul>
         <form method="POST">
             <label for="nombre">Nombre:</label><br>
             <input type="text" id="nombre" name="nombre"><br><br>
@@ -19,6 +25,11 @@
                 {% for local in locales %}
                     <option value="{{ local[0] }}">{{ local[1] }}</option>
                 {% endfor %}
+            </select><br><br>
+            <label for="rol">Rol:</label><br>
+            <select id="rol" name="rol">
+                <option value="vendedor">Vendedor</option>
+                <option value="admin">Administrador</option>
             </select><br><br>
             <input type="submit" value="Registrar">
         </form>

@@ -8,8 +8,8 @@
         <p>Rol: {{ current_user.rol }}</p>
 
         {% if current_user.rol == 'vendedor' %}
-            <p>Local: {{ current_user.local_id }}</p>
-        {% endif %}
+        <p>Local: {{ current_user.local_nombre }}</p>
+    {% endif %}
 
         <h2>Funcionalidades</h2>
 

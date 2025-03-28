@@ -10,7 +10,7 @@ from reportlab.lib import colors
 from reportlab.lib.pagesizes import letter
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle  # Importación corregida
 from reportlab.pdfgen import canvas
-from flask import Flask, render_template, request, redirect, send_file, url_for, flash
+from flask import Flask, render_template, request, redirect, send_file, session, url_for, flash
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from flask_wtf import FlaskForm
 from wtforms import SelectField, StringField, PasswordField, SubmitField
@@ -112,7 +112,7 @@ login_manager.login_view = 'login'
 
     # Clase de Usuario para Flask-Login
 class Usuario(UserMixin):
-        def __init__(self, id, nombre, apellido, correo, contrasena, rol, local_id):
+        def __init__(self, id, nombre, apellido, correo, contrasena, rol, local_id, local_nombre):
             self.id = id
             self.nombre = nombre
             self.apellido = apellido
@@ -120,20 +120,26 @@ class Usuario(UserMixin):
             self.contrasena = contrasena
             self.rol = rol
             self.local_id = local_id
+            self.local_nombre = local_nombre
 
     # Función para cargar usuario
 @login_manager.user_loader
 def load_user(user_id):
         conn = get_db_connection()
         cur = conn.cursor()
-        cur.execute('SELECT * FROM Usuarios WHERE Cod_Usuario = %s;', (user_id,))
+        cur.execute("""
+            SELECT Usuarios.*, Locales.Nombre AS local_nombre
+            FROM Usuarios
+            JOIN Locales ON Usuarios.local_id = Locales.local_id
+            WHERE Usuarios.Cod_Usuario = %s;
+        """, (user_id,))
         usuario = cur.fetchone()
         cur.close()
         conn.close()
         if usuario:
-            return Usuario(usuario[0], usuario[1], usuario[2], usuario[3], usuario[4], usuario[5], usuario[6])
+            # Incluir el nombre del local al crear el objeto Usuario
+            return Usuario(usuario[0], usuario[1], usuario[2], usuario[3], usuario[4], usuario[5], usuario[6], usuario[7])
         return None
-
     # Formulario de Login
 class LoginForm(FlaskForm):
         correo = StringField('Correo', validators=[DataRequired(), Email()])
@@ -141,6 +147,7 @@ class LoginForm(FlaskForm):
         submit = SubmitField('Iniciar Sesión')
 
 @app.route('/registrar_vendedor', methods=['GET', 'POST'])
+@login_required
 def registrar_vendedor():
         if current_user.rol != 'admin':
             flash('No tienes permiso para acceder a esta página', 'danger')
@@ -156,6 +163,7 @@ def registrar_vendedor():
             correo = request.form['correo']
             contrasena = request.form['contrasena']
             local_id = request.form['local_id']
+            rol = request.form['rol'] # Obtener el rol del formulario
             error = None
 
             if not nombre:
@@ -168,6 +176,8 @@ def registrar_vendedor():
                 error = 'Contraseña es requerida.'
             elif not local_id:
                 error = 'Local es requerido.'
+            elif not rol: # Verificar que se haya seleccionado un rol
+                error = 'Rol es requerido.'
 
             if error is None:
                 try:
@@ -179,7 +189,7 @@ def registrar_vendedor():
 
                     cur.execute(
                         "INSERT INTO Usuarios (Nombre, Apellido, Correo, Contrasena, Rol, local_id) VALUES (%s, %s, %s, %s, %s, %s);",
-                        (nombre, apellido, correo, hash_str, 'vendedor', local_id),
+                        (nombre, apellido, correo, hash_str, rol, local_id), # Usar el rol obtenido del formulario
                     )
                     conn.commit()
                 except psycopg2.IntegrityError:
@@ -208,15 +218,21 @@ def login():
             contrasena = form.contrasena.data
             conn = get_db_connection()
             cur = conn.cursor()
-            cur.execute('SELECT * FROM Usuarios WHERE Correo = %s;', (correo,))
+            cur.execute("""
+                SELECT Usuarios.*, Locales.Nombre AS local_nombre
+                FROM Usuarios
+                JOIN Locales ON Usuarios.local_id = Locales.local_id
+                WHERE Usuarios.Correo = %s;
+            """, (correo,))
             usuario = cur.fetchone()
             cur.close()
             conn.close()
             if usuario:
-                contrasena_db = usuario[4].encode('utf-8') # Obtener el hash de la base de datos
-                contrasena_ingresada = contrasena.encode('utf-8') # convertir a bytes
-                if bcrypt.checkpw(contrasena_ingresada, contrasena_db): # usar bcrypt.checkpw
+                contrasena_db = usuario[4].encode('utf-8')
+                contrasena_ingresada = contrasena.encode('utf-8')
+                if bcrypt.checkpw(contrasena_ingresada, contrasena_db):
                     user = Usuario(usuario[0], usuario[1], usuario[2], usuario[3], usuario[4], usuario[5], usuario[6])
+                    user.local_nombre = usuario[7] # Obtener el nombre del local del resultado de la consulta
                     login_user(user)
                     return redirect(url_for('dashboard'))
                 else:
